@@ -11,6 +11,7 @@ namespace Game
         [SerializeField] private LevelCompletePanel _levelCompletePanel;
         [SerializeField] private TutorialPanel _tutorialPanel;
         [SerializeField] private GameObject _winEffect;
+        [SerializeField] public ShopPanel _shopPanel;
 
 
         public static bool IsFirstTime

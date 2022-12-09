@@ -9,6 +9,7 @@ public class GamePlayPanel : ShowHidable
     [SerializeField] private Button _undoBtn;
     [SerializeField] private Text _lvlTxt;
     [SerializeField] private Text _lvlTutorial;
+    
 
     private void Start()
     {
@@ -38,7 +39,7 @@ public class GamePlayPanel : ShowHidable
         },false);
     }
 
-    public void OnClickSkip()
+    /*public void OnClickSkip()
     {
         if (!AdsManager.IsVideoAvailable())
         {
@@ -60,9 +61,9 @@ public class GamePlayPanel : ShowHidable
             });
           
         });
-    }
+    }*/
 
-    public void OnClickMenu()
+    public void OnClicSetting()
     {
         //SharedUIManager.PopUpPanel.ShowAsConfirmation("Exit?","Are you sure want to exit the game?", success =>
         //{
@@ -71,9 +72,12 @@ public class GamePlayPanel : ShowHidable
 
         //    GameManager.LoadScene("MainMenu");
         //});
-        SharedUIManager.PausePanel.Show();
+        SharedUIManager.SettingPanel.Show();
     }
-
+    public void OnClickShop()
+    {
+        UIManager.Instance._shopPanel.Show();
+    }
     private void Update()
     {
         _undoBtn.interactable = LevelManager.Instance.HaveUndo;

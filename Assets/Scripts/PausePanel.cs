@@ -59,7 +59,7 @@ public class PausePanel : ShowHidable
 #endif
 
 
-    public void OnClickCloseButton()
+    /*public void OnClickCloseButton()
     {
         SharedUIManager.PausePanel.Hide();
     }
@@ -69,7 +69,7 @@ public class PausePanel : ShowHidable
         Debug.Log("Go to menu");
         GameManager.LoadScene("MainMenu");
         SharedUIManager.PausePanel.Hide();
-    }
+    }*/
 
     public void OnClickRemoveAds()
     {

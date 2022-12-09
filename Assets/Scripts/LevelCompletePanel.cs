@@ -36,6 +36,6 @@ public class LevelCompletePanel : ShowHidable
     public void OnClickMainMenu()
     {
         GameManager.LoadScene("MainMenu");
-        SharedUIManager.PausePanel.Hide();
+        SharedUIManager.SettingPanel.Hide();
     }
 }

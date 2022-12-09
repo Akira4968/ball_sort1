@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Holder : MonoBehaviour,IInitializable<IEnumerable<Ball>>
 {
@@ -10,6 +11,7 @@ public class Holder : MonoBehaviour,IInitializable<IEnumerable<Ball>>
     [SerializeField] private float _ballRadius;
 
     [SerializeField] private AudioClip _popClip,_putClip;
+    
 
     private readonly List<Ball> _balls = new List<Ball>();
     private bool _isPending;

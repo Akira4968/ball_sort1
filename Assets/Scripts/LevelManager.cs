@@ -13,7 +13,12 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private float _minXDistanceBetweenHolders;
     [SerializeField] private Camera _camera;
     [SerializeField] private Holder _holderPrefab;
+    [SerializeField] List<Holder> _holderPrefapList;
     [SerializeField] private Ball _ballPrefab;
+    private int _holderCount=0;
+    [SerializeField] private GameObject[] listHolders;
+    [SerializeField] private GameObject[] listBalls;
+    private List<GameObject> listBallTopRow = new List<GameObject>();
 
     [SerializeField] private AudioClip _winClip;
 
@@ -36,6 +41,7 @@ public class LevelManager : MonoBehaviour
         Level = loadGameData.Level;
         LoadLevel();
         CurrentState = State.Playing;
+        _holderCount = Level.map.Count;
     }
 
     private void LoadLevel()
@@ -46,7 +52,7 @@ public class LevelManager : MonoBehaviour
         for (var i = 0; i < Level.map.Count; i++)
         {
             var levelColumn = Level.map[i];
-            var holder = Instantiate(_holderPrefab, list[i], Quaternion.identity);
+            var holder = Instantiate(GetHolderPrefap(PrefManager.GetInt("holder")), list[i], Quaternion.identity);
 
             holder.Init(levelColumn.Select(g =>
             {
@@ -59,6 +65,13 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    public Holder GetHolderPrefap(int value)
+    {
+        _holderPrefab = _holderPrefapList[value];
+        return _holderPrefab;
+        
+    }
+
     public void OnClickUndo()
     {
         Debug.Log("UNDO :" + _undoStack.Count);
@@ -67,6 +80,216 @@ public class LevelManager : MonoBehaviour
 
         var moveData = _undoStack.Pop();
         MoveBallFromOneToAnother(moveData.ToHolder,moveData.FromHolder);
+    }
+    public void OnClickAdd()
+    {
+        _holderCount++;
+        List<Vector2> hold = PositionsForHolders(_holderCount, out float width).ToList();
+        var holder = Instantiate(GetHolderPrefap(PrefManager.GetInt("holder")), Vector2.zero, Quaternion.identity);
+        _holders.Add(holder);
+        for(int i = 0;i<_holderCount;i++)
+        {
+            _holders[i].transform.position = hold[i];
+        }
+
+    }
+    public void OnClickAddHolder()
+    {
+       
+        
+        listHolders = (GameObject.FindGameObjectsWithTag("Holder"));
+        listBalls = (GameObject.FindGameObjectsWithTag("Ball"));
+        if (_holderCount < 6)
+        {
+            
+            for (int i = 0; i < listHolders.Length; i++)
+            {
+                listHolders[i].transform.position = new Vector2(listHolders[i].transform.position.x - 1.05f, listHolders[i].transform.position.y);
+            }
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                listBalls[i].transform.position = new Vector2(listBalls[i].transform.position.x - 1.05f, listBalls[i].transform.position.y);
+            }
+
+
+            var levelColumn = Enumerable.Empty<int>();
+            var holder = Instantiate(GetHolderPrefap(PrefManager.GetInt("holder")), new Vector2(listHolders[_holderCount - 1].transform.position.x + _minXDistanceBetweenHolders, listHolders[_holderCount - 1].transform.position.y), Quaternion.identity);
+            holder.Init(levelColumn.Select(g =>
+            {
+                var ball = Instantiate(_ballPrefab);
+                ball.GroupId = g;
+                return ball;
+            }));
+
+            _holders.Add(holder);
+            listHolders = (GameObject.FindGameObjectsWithTag("Holder"));
+            _holderCount++;
+            _camera.orthographicSize = 0.55f * (_holderCount) * _minXDistanceBetweenHolders * Screen.height / Screen.width;
+            
+        }
+        else if (_holderCount == 6)
+        {
+            for (int i = 0; i < listHolders.Length; i++)
+            {
+                listHolders[i].transform.position = new Vector2(listHolders[i].transform.position.x, listHolders[i].transform.position.y + 4.67f);
+            }
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                listBalls[i].transform.position = new Vector2(listBalls[i].transform.position.x, listBalls[i].transform.position.y + 4.67f);
+            }
+            var levelColumn = Enumerable.Empty<int>();
+            var holder = Instantiate(GetHolderPrefap(PrefManager.GetInt("holder")), new Vector2(0, -5.67f), Quaternion.identity);
+            holder.Init(levelColumn.Select(g =>
+            {
+                var ball = Instantiate(_ballPrefab);
+                ball.GroupId = g;
+                return ball;
+            }));
+
+            _holders.Add(holder);
+            listHolders = (GameObject.FindGameObjectsWithTag("Holder"));
+            _holderCount++;
+            
+        }
+        else if (_holderCount < 12)
+        {
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                if (listBalls[i].transform.position.y > 0)
+                {
+                    listBallTopRow.Add(listBalls[i]);
+                }
+            }
+            for (int i = 6; i < listHolders.Length; i++)
+            {
+                listHolders[i].transform.position = new Vector2(listHolders[i].transform.position.x - 1.05f, listHolders[i].transform.position.y);
+            }
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                if (!listBallTopRow.Contains(listBalls[i]))
+                {
+                    listBalls[i].transform.position = new Vector2(listBalls[i].transform.position.x - 1.05f, listBalls[i].transform.position.y);
+                }
+            }
+
+            var levelColumn = Enumerable.Empty<int>();
+            var holder = Instantiate(GetHolderPrefap(PrefManager.GetInt("holder")), new Vector2(listHolders[_holderCount - 1].transform.position.x + _minXDistanceBetweenHolders, listHolders[_holderCount - 1].transform.position.y), Quaternion.identity);
+            holder.Init(levelColumn.Select(g =>
+            {
+                var ball = Instantiate(_ballPrefab);
+                ball.GroupId = g;
+                return ball;
+            }));
+
+            _holders.Add(holder);
+            listBallTopRow.Clear();
+            listHolders = (GameObject.FindGameObjectsWithTag("Holder"));
+            _holderCount++;
+            
+        }
+        else if (_holderCount == 12)
+        {
+            float sizeCam = 0f;
+            float sizeUp = 0f;
+            if (Screen.height / Screen.width == 3840 / 2160)
+            {
+                sizeCam = 0.6f;
+                sizeUp = 3.73f;
+            }
+            else
+            {
+                sizeCam = 0.55f;
+                sizeUp = 4.67f;
+            }
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                if (listBalls[i].transform.position.y > 0)
+                {
+                    listBallTopRow.Add(listBalls[i]);
+                }
+            }
+            for (int i = 0; i < listHolders.Length; i++)
+            {
+                if (i < 6)
+                {
+                    listHolders[i].transform.position = new Vector2(listHolders[i].transform.position.x, listHolders[i].transform.position.y + 2);
+                }
+                else
+                {
+                    listHolders[i].transform.position = new Vector2(listHolders[i].transform.position.x, listHolders[i].transform.position.y + sizeUp);
+                }
+            }
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                if (listBallTopRow.Contains(listBalls[i]))
+                {
+                    listBalls[i].transform.position = new Vector2(listBalls[i].transform.position.x, listBalls[i].transform.position.y + 2);
+                }
+                else
+                {
+                    listBalls[i].transform.position = new Vector2(listBalls[i].transform.position.x, listBalls[i].transform.position.y + sizeUp);
+                }
+            }
+            //camera
+            _camera.orthographicSize = sizeCam * 6 * _minXDistanceBetweenHolders * Screen.height / Screen.width;
+            var levelColumn = Enumerable.Empty<int>();
+            var holder = Instantiate(GetHolderPrefap(PrefManager.GetInt("holder")), new Vector2(0, -7.67f), Quaternion.identity);
+            holder.Init(levelColumn.Select(g =>
+            {
+                var ball = Instantiate(_ballPrefab);
+                ball.GroupId = g;
+                return ball;
+            }));
+
+            _holders.Add(holder);
+            listBallTopRow.Clear();
+            listHolders = (GameObject.FindGameObjectsWithTag("Holder"));
+            _holderCount++;
+            
+        }
+        else if (_holderCount > 12 && _holderCount < 18)
+        {
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                if (listBalls[i].transform.position.y >= -1)
+                {
+                    listBallTopRow.Add(listBalls[i]);
+                }
+            }
+            for (int i = 12; i < listHolders.Length; i++)
+            {
+                listHolders[i].transform.position = new Vector2(listHolders[i].transform.position.x - 1.05f, listHolders[i].transform.position.y);
+            }
+            for (int i = 0; i < listBalls.Length; i++)
+            {
+                if (!listBallTopRow.Contains(listBalls[i]))
+                {
+                    listBalls[i].transform.position = new Vector2(listBalls[i].transform.position.x - 1.05f, listBalls[i].transform.position.y);
+                }
+            }
+            //camera
+            if (Screen.height / Screen.width == 3840 / 2160)
+            {
+                _camera.orthographicSize = 0.6f * 6 * _minXDistanceBetweenHolders * Screen.height / Screen.width;
+            }
+            else
+            {
+                _camera.orthographicSize = 0.55f * 6 * _minXDistanceBetweenHolders * Screen.height / Screen.width;
+            }
+            var levelColumn = Enumerable.Empty<int>();
+            var holder = Instantiate(GetHolderPrefap(PrefManager.GetInt("holder")), new Vector2(listHolders[_holderCount - 1].transform.position.x + _minXDistanceBetweenHolders, listHolders[_holderCount - 1].transform.position.y), Quaternion.identity);
+            holder.Init(levelColumn.Select(g =>
+            {
+                var ball = Instantiate(_ballPrefab);
+                ball.GroupId = g;
+                return ball;
+            }));
+
+            _holders.Add(holder);
+            listBallTopRow.Clear();
+            listHolders = (GameObject.FindGameObjectsWithTag("Holder"));
+            _holderCount++;
+        }
     }
 
     private void Update()

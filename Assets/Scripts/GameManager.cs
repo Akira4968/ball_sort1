@@ -33,6 +33,7 @@ namespace dotmob
             if (showLoading && loadingPanel != null)
             {
                 loadingPanel.Speed = loadingScreenSpeed;
+                loadingPanel.Fill = Mathf.Lerp(0,1,loadingScreenSpeed);
                 loadingPanel.Show(completed: () =>
                 {
                     SceneManager.LoadScene(sceneName);
